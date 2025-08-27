@@ -1,0 +1,14 @@
+#usda 1.0
+(
+    defaultPrim = "box"
+    customLayerData = {
+        string post_process = "blendShape"
+    }
+)
+
+def Xform "box" {
+    def Mesh "geo" {
+        double3[] points = [ (0,0,0), (1,0,0), (1,1,0), (0,1,0) ]
+        uniform token subdivisionScheme = "catmullClark"
+    }
+}

@@ -1,0 +1,7 @@
+#usda 1.0
+(
+    defaultPrim = "bike"
+    customLayerData = {
+        string asset_origin = "prop/bike/v002/bike_v002.mb"
+    }
+)

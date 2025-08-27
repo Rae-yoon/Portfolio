@@ -1,0 +1,416 @@
+
+##AlfredToDo 3.0
+
+    Job -title {Maya Render Assets | turntable | char - boy_v002} -priority {100} -after {08 22 17:53} -afterjids {} -projects {CUSTOM_PROJECT} -maxactive {0} -comment {turntable test} -metadata {} -dirmaps {
+        } -envkey {maya} -pbias 0 -tags {td} -service {RENDER} -serialsubtasks 1 -init {
+                Assign exeSh {"%D(/bin/bash)"}
+            } -subtasks {
+        
+        Task -title {Set a turntable} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track preprocess 44819 1 100'}            
+        }    
+        
+        Task -title {Turntable Frames} -subtasks {
+            
+        Task -title {Frame:1} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 1 100'}            
+        }    
+        
+        Task -title {Frame:2} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 2 100'}            
+        }    
+        
+        Task -title {Frame:3} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 3 100'}            
+        }    
+        
+        Task -title {Frame:4} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 4 100'}            
+        }    
+        
+        Task -title {Frame:5} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 5 100'}            
+        }    
+        
+        Task -title {Frame:6} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 6 100'}            
+        }    
+        
+        Task -title {Frame:7} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 7 100'}            
+        }    
+        
+        Task -title {Frame:8} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 8 100'}            
+        }    
+        
+        Task -title {Frame:9} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 9 100'}            
+        }    
+        
+        Task -title {Frame:10} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 10 100'}            
+        }    
+        
+        Task -title {Frame:11} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 11 100'}            
+        }    
+        
+        Task -title {Frame:12} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 12 100'}            
+        }    
+        
+        Task -title {Frame:13} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 13 100'}            
+        }    
+        
+        Task -title {Frame:14} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 14 100'}            
+        }    
+        
+        Task -title {Frame:15} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 15 100'}            
+        }    
+        
+        Task -title {Frame:16} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 16 100'}            
+        }    
+        
+        Task -title {Frame:17} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 17 100'}            
+        }    
+        
+        Task -title {Frame:18} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 18 100'}            
+        }    
+        
+        Task -title {Frame:19} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 19 100'}            
+        }    
+        
+        Task -title {Frame:20} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 20 100'}            
+        }    
+        
+        Task -title {Frame:21} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 21 100'}            
+        }    
+        
+        Task -title {Frame:22} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 22 100'}            
+        }    
+        
+        Task -title {Frame:23} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 23 100'}            
+        }    
+        
+        Task -title {Frame:24} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 24 100'}            
+        }    
+        
+        Task -title {Frame:25} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 25 100'}            
+        }    
+        
+        Task -title {Frame:26} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 26 100'}            
+        }    
+        
+        Task -title {Frame:27} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 27 100'}            
+        }    
+        
+        Task -title {Frame:28} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 28 100'}            
+        }    
+        
+        Task -title {Frame:29} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 29 100'}            
+        }    
+        
+        Task -title {Frame:30} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 30 100'}            
+        }    
+        
+        Task -title {Frame:31} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 31 100'}            
+        }    
+        
+        Task -title {Frame:32} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 32 100'}            
+        }    
+        
+        Task -title {Frame:33} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 33 100'}            
+        }    
+        
+        Task -title {Frame:34} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 34 100'}            
+        }    
+        
+        Task -title {Frame:35} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 35 100'}            
+        }    
+        
+        Task -title {Frame:36} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 36 100'}            
+        }    
+        
+        Task -title {Frame:37} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 37 100'}            
+        }    
+        
+        Task -title {Frame:38} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 38 100'}            
+        }    
+        
+        Task -title {Frame:39} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 39 100'}            
+        }    
+        
+        Task -title {Frame:40} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 40 100'}            
+        }    
+        
+        Task -title {Frame:41} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 41 100'}            
+        }    
+        
+        Task -title {Frame:42} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 42 100'}            
+        }    
+        
+        Task -title {Frame:43} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 43 100'}            
+        }    
+        
+        Task -title {Frame:44} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 44 100'}            
+        }    
+        
+        Task -title {Frame:45} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 45 100'}            
+        }    
+        
+        Task -title {Frame:46} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 46 100'}            
+        }    
+        
+        Task -title {Frame:47} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 47 100'}            
+        }    
+        
+        Task -title {Frame:48} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 48 100'}            
+        }    
+        
+        Task -title {Frame:49} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 49 100'}            
+        }    
+        
+        Task -title {Frame:50} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 50 100'}            
+        }    
+        
+        Task -title {Frame:51} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 51 100'}            
+        }    
+        
+        Task -title {Frame:52} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 52 100'}            
+        }    
+        
+        Task -title {Frame:53} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 53 100'}            
+        }    
+        
+        Task -title {Frame:54} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 54 100'}            
+        }    
+        
+        Task -title {Frame:55} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 55 100'}            
+        }    
+        
+        Task -title {Frame:56} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 56 100'}            
+        }    
+        
+        Task -title {Frame:57} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 57 100'}            
+        }    
+        
+        Task -title {Frame:58} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 58 100'}            
+        }    
+        
+        Task -title {Frame:59} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 59 100'}            
+        }    
+        
+        Task -title {Frame:60} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 60 100'}            
+        }    
+        
+        Task -title {Frame:61} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 61 100'}            
+        }    
+        
+        Task -title {Frame:62} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 62 100'}            
+        }    
+        
+        Task -title {Frame:63} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 63 100'}            
+        }    
+        
+        Task -title {Frame:64} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 64 100'}            
+        }    
+        
+        Task -title {Frame:65} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 65 100'}            
+        }    
+        
+        Task -title {Frame:66} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 66 100'}            
+        }    
+        
+        Task -title {Frame:67} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 67 100'}            
+        }    
+        
+        Task -title {Frame:68} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 68 100'}            
+        }    
+        
+        Task -title {Frame:69} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 69 100'}            
+        }    
+        
+        Task -title {Frame:70} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 70 100'}            
+        }    
+        
+        Task -title {Frame:71} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 71 100'}            
+        }    
+        
+        Task -title {Frame:72} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 72 100'}            
+        }    
+        
+        Task -title {Frame:73} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 73 100'}            
+        }    
+        
+        Task -title {Frame:74} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 74 100'}            
+        }    
+        
+        Task -title {Frame:75} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 75 100'}            
+        }    
+        
+        Task -title {Frame:76} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 76 100'}            
+        }    
+        
+        Task -title {Frame:77} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 77 100'}            
+        }    
+        
+        Task -title {Frame:78} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 78 100'}            
+        }    
+        
+        Task -title {Frame:79} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 79 100'}            
+        }    
+        
+        Task -title {Frame:80} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 80 100'}            
+        }    
+        
+        Task -title {Frame:81} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 81 100'}            
+        }    
+        
+        Task -title {Frame:82} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 82 100'}            
+        }    
+        
+        Task -title {Frame:83} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 83 100'}            
+        }    
+        
+        Task -title {Frame:84} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 84 100'}            
+        }    
+        
+        Task -title {Frame:85} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 85 100'}            
+        }    
+        
+        Task -title {Frame:86} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 86 100'}            
+        }    
+        
+        Task -title {Frame:87} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 87 100'}            
+        }    
+        
+        Task -title {Frame:88} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 88 100'}            
+        }    
+        
+        Task -title {Frame:89} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 89 100'}            
+        }    
+        
+        Task -title {Frame:90} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 90 100'}            
+        }    
+        
+        Task -title {Frame:91} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 91 100'}            
+        }    
+        
+        Task -title {Frame:92} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 92 100'}            
+        }    
+        
+        Task -title {Frame:93} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 93 100'}            
+        }    
+        
+        Task -title {Frame:94} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 94 100'}            
+        }    
+        
+        Task -title {Frame:95} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 95 100'}            
+        }    
+        
+        Task -title {Frame:96} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 96 100'}            
+        }    
+        
+        Task -title {Frame:97} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 97 100'}            
+        }    
+        
+        Task -title {Frame:98} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 98 100'}            
+        }    
+        
+        Task -title {Frame:99} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 99 100'}            
+        }    
+        
+        Task -title {Frame:100} -subtasks {} -cmds {
+            RemoteCmd {$exeSh -c '/home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_17_54_46.sh turn_track render 44819 100 100'}            
+        }    
+        
+        }    
+        }

@@ -1,0 +1,40 @@
+#usda 1.0
+
+
+def "Anim"
+{
+    def "Char"
+    {
+
+        over Xform "girl" (
+            active = true
+            references = [
+                @model/s0010/0020/girl/current/girl.usd@
+            ]
+        )
+        {
+        }
+    }
+
+    def "Prop"
+    {
+        over Xform "bike" (
+            active = true
+            references = [
+                @model/s0010/0020/bike/current/bike.usd@
+            ]
+        )
+        {
+        }
+
+        over Xform "box" (
+            active = true
+            references = [
+                @model/s0010/0020/box/current/box.usd@
+            ]
+        )
+        {
+        }
+    }
+}
+

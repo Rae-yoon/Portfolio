@@ -1,0 +1,14 @@
+#usda 1.0
+(
+    defaultPrim = "girl"
+    customLayerData = {
+        string post_process = "subdiv"
+    }
+)
+
+def Xform "girl" {
+    def Mesh "geo" {
+        double3[] points = [ (0,0,0), (1,0,0), (1,1,0), (0,1,0) ]
+        uniform token subdivisionScheme = "catmullClark"
+    }
+}

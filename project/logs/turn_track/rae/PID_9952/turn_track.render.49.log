@@ -1,0 +1,3 @@
+[2025-08-21 14:01:21][18288][rae][/home/user_rae/Documents/project/public/bin/maya/turntable.py][INFO][<module>][215] [ Turntable render start ]
+[2025-08-21 14:01:21][18288][rae][/home/user_rae/Documents/project/public/bin/maya/turntable.py][INFO][__init__][47] start : 49, end : 100
+[2025-08-21 14:01:47][18288][rae][/home/user_rae/Documents/project/public/bin/maya/turntable.py][INFO][set_render][190] cmd : /usr/autodesk/maya2024/bin/Render -r hw2 -proj /home/user_rae/Documents/project/public/render/asset/turntable/char/boy/v002 -fnc 3 -of png -rd /home/user_rae/Documents/project/public/render/asset/turntable/char/boy/v002 -cam turntable_cam1 -s 49 -e 49 -b 1 /home/user_rae/Documents/project/public/render/asset/turntable/char/boy/v002/tmp/turntable_boy_v002.mb

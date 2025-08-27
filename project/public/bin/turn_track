@@ -1,0 +1,884 @@
+#!/usr/bin/python
+
+
+"""turn_track
+
+Main executable for Turn Track. Launches the UI.
+All features including shots, assets, Flow, USD files, Perforce and Tractor integration.
+
+Key Features:
+    - TurnTrackUI class: Main window for Turn Track with linked features and layouts.
+        - TTGet class: Getter for Turn Track data including UI, shots, assets, and USD files.
+        - TTSet class: Setter for Turn Track data and UI modifications (inherits from TTGet).
+            - TurnTrackUIs class: Dynamic dictionary for managing UI items.
+
+Notes:
+    - TTSet and TurnTrackUI are primarily setters; methods generally have no return values.
+    - Lazy getters are used for heavy connections like FlowAssets and Perforce to improve performance.
+
+Author: Raeyoon Kim
+Created: 2025-08-21
+"""
+
+
+from __future__ import annotations
+from typing import Optional, Dict, List, Union, Any
+import os, sys, re, bisect
+os.environ['tool_name'] = 'turn_track'
+from lib.log import LogBus
+MAIN_LOG_BUS = LogBus.init(os.environ['tool_name'], light=True)
+LOG = MAIN_LOG_BUS.get_main_q_logger()
+from lib.core import Core
+from lib.shot import ShotLib, FlowShots
+from lib.asset import UsdAssets
+from lib.ui import Ui, UiHbox, UiVbox, Message
+from PyQt5.QtWidgets import QWidget, QApplication, QMenu, QHeaderView
+from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtGui import QFont
+from lib.render.render_turntable import TurntableRender
+from functools import lru_cache
+
+
+class TTGet:
+    """Turn Track getter with UI, shots, assets, and Perforce connections.
+
+    Attibutes:
+        ui (Ui): Class to create or edit Ui directly.
+        shot_lib (ShotLib): Class to handle general shots.
+        flow_shots (FlowShots): Class to handle shots with flow connection.
+        flow_assets (FlowAssets): Class to handle assets with flow connection. Lazy getter to avoid heavy connection.
+        p4 (Perforce): Class to get and set perfoce data. Lazy getter to avoid heavy connection.
+        usd_assets (UsdAssets): Class to handle USD files of assets.
+        seqshots (dict): Sequence and shots from flow or server.
+    """
+    
+    def __init__(self):
+        self.ui = Ui()
+        self.shot_lib = ShotLib()
+        self.flow_shots = FlowShots()
+        self.flow_assets = None
+        self.p4 = None
+        self.usd_assets = UsdAssets()
+        
+        if self.flow_shots.sg:
+            self.seqshots = self.flow_shots.get_seqshots()
+        else:
+            self.seqshots = self.shot_lib.get_seqshots()
+            
+        if not self.seqshots:
+            LOG.error('can not find any sequences or shots')
+
+    @property
+    def get_p4(self) -> Perforce:
+        """Get Perforce instance, create if not exists.
+
+        Returns:
+            Perforce: Perforce client instance.
+        """
+        from lib.perforce import Perforce
+        if not self.p4:
+            self.p4 = Perforce()
+        return self.p4
+
+    @property
+    def get_flow_assets(self) -> FlowAssets:
+        """Get FlowAssets instance, create if not exists.
+
+        Returns:
+            FlowAssets: Flow assets manager.
+        """
+        from lib.asset import FlowAssets
+        if not self.flow_assets:
+            self.flow_assets = FlowAssets(sg=self.flow_shots.sg)
+        return self.flow_assets
+    
+    def get_seqshot_selection(self, last_one: bool = False) -> Union[Dict[str, List[str]], List[str]]:
+        """Get selected sequences and shots from the UI.
+
+        Args:
+            last_one (bool, optional): Return only the last selected shot. Defaults to 0.
+
+        Returns:
+            Union[Dict[str, List[str]], List[str]]: Selected sequences and shots or last shot.
+        """
+        seqshot_sels = {}
+        sel_shot_items = TTSet.uis.tree_shots.selectedItems()
+        if sel_shot_items:
+            if last_one:
+                parent_item = sel_shot_items[-1].parent()
+                if parent_item:
+                    seq = str(parent_item.text(0))
+                    shot = sel_shot_items[-1].text(0)
+                else:
+                    seq = sel_shot_items[-1].text(0)
+                    shot = ''
+                return [seq, shot]
+            else:
+                for sel_shot_item in sel_shot_items:
+                    parent_item = sel_shot_item.parent()
+                    shot = sel_shot_item.text(0)
+                    if parent_item:
+                        seq = str(parent_item.text(0))      
+                        if seqshot_sels.get(seq, None):
+                            bisect.insort(seqshot_sels[seq], shot)  
+                        else:
+                            seqshot_sels[seq] = [shot]
+                    else:
+                        seq = shot
+                        seqshot_sels[seq] = self.seqshots[seq]
+        if seqshot_sels:
+            seqshot_sels = dict(sorted(seqshot_sels.items(), key=lambda x: x[1]))
+            seqshot_sels = dict(sorted(seqshot_sels.items(), key=lambda x: x[0]))    
+        return seqshot_sels
+    
+    def get_asset_sels(self) -> Optional[List[str]]:
+        """Get selected asset type and name from the UI.
+
+        Returns:
+            Optional[List[str]]: [asset_type, asset_name] or None.
+        """
+        sel_asset_items = TTSet.uis.tree_assets_usd.selectedItems()
+        if sel_asset_items:
+            parent_item = sel_asset_items[-1].parent()
+            if parent_item:
+                asset_type = str(parent_item.text(0))
+                asset_name = sel_asset_items[-1].text(0)
+                return [asset_type, asset_name]
+    
+    def get_asset_data_usd_and_flow(self, seq: str = '', shot: str = '') -> Dict[str, Any]:
+        """Get asset data from USD and Flow for a given sequence and shot.
+
+        Args:
+            seq (str, optional): Sequence name. Defaults to ''.
+            shot (str, optional): Shot name. Defaults to ''.
+
+        Returns:
+            Dict[str, Any]: Asset data grouped by type.
+        """
+        assets = self.usd_assets.get_assets_from_usds(seq=seq, shot=shot)      
+        asset_names = [x['origin_name'] for x in assets]  
+        if self.get_flow_assets.sg:
+            asset_type_names = self.get_flow_assets.get_asset_type_names_from_flow(asset_names=asset_names)
+        else:
+            asset_type_names = self.usd_assets.get_asset_type_names(asset_names=tuple(asset_names))
+        asset_data = self.usd_assets.get_asset_data_with_type(seq=seq, shot=shot, assets=assets, asset_type_names=asset_type_names)
+        return asset_data
+    
+    @staticmethod
+    @lru_cache(maxsize=128)
+    def get_asset_list(path_asset_dir: str = '') -> List[str]:
+        """List files in asset directory (cached).
+
+        Args:
+            path_asset_dir (str): Directory path. Defaults to ''.
+
+        Returns:
+            List[str]: List of filenames.
+        """
+        return os.listdir(path_asset_dir)
+    
+    def get_asset_origin_maya_info(self, asset_type: str = '', asset_name: str = '', standard: str = 'stable') -> Optional[Dict[str, Any]]:
+        """Get original Maya info for an asset from Perforce and USD.
+
+        Args:
+            asset_type (str, optional): Type of asset. Defaults to ''.
+            asset_name (str, optional): Name of asset. Defaults to ''.
+            standard (str, optional): Standard version folder. Defaults to 'stable'.
+
+        Returns:
+            Optional[Dict[str, Any]]: Maya asset info or None.
+        """
+        path_asset_dir = os.path.join(os.getenv('base_asset'), asset_type, asset_name, standard)        
+        usd_files = [x for x in self.get_asset_list(path_asset_dir) if os.path.exists(path_asset_dir) and re.fullmatch(f'{asset_name}.usd', x)]
+        path_usd = ''
+        if usd_files:
+            path_usd = os.path.join(path_asset_dir, usd_files[0])
+            
+        if path_usd:
+            asset_origin_maya_info = {}
+            asset_origin_maya_info = self.usd_assets.get_custom_layer_data(path_usd=path_usd, asset_info=asset_origin_maya_info, key='asset_origin')
+            tail_asset_maya = asset_origin_maya_info.get('asset_origin', None)
+            if tail_asset_maya:
+                path_asset_maya = os.path.join(os.getenv('base_asset_origin'), tail_asset_maya)
+                if os.path.exists(path_asset_maya):            
+                    current_editor = self.get_p4.file_info.get_editor(path=path_asset_maya)
+                    last_editor = self.get_p4.file_info.get_last_editor(path=path_asset_maya) or 'rae'
+                    last_edit_time = self.get_p4.file_info.get_last_modified_date(path=path_asset_maya) or '2025 08/04 17:55'
+                    p4_vers = self.get_p4.file_info.get_revs(path=path_asset_maya, local=1, depot=True) or {'head':12, 'have':3}
+
+                    asset_origin_maya_info['asset_origin'] = tail_asset_maya
+                    asset_origin_maya_info['p4_editor_current'] = current_editor
+                    asset_origin_maya_info['p4_editor_last'] = last_editor
+                    asset_origin_maya_info['p4_last_edit_time'] = last_edit_time
+                    asset_origin_maya_info['p4_head_ver.'] = p4_vers['head']
+                    asset_origin_maya_info['p4_have_ver.'] = p4_vers['have']
+                    
+            return asset_origin_maya_info
+            
+    def get_asset_info_table_data(self, asset_sels: List[str] = []) -> Optional[Dict[str, Any]]:
+        """Get asset info data for table display based on selected assets.
+
+        Args:
+            asset_sels (List[str], optional): Selected asset [type, name]. Defaults to [].
+
+        Returns:
+            Optional[Dict[str, Any]]: Asset info dictionary or None.
+        """
+        seqshot_sels = self.get_seqshot_selection(last_one=True)
+        if all([seqshot_sels, asset_sels]):
+            asset_type = asset_sels[0]
+            asset_name = asset_sels[1]
+            assets = self.get_asset_data_usd_and_flow(seq=seqshot_sels[0], shot=seqshot_sels[1])   
+            asset_targets = assets[asset_type]
+            for asset_target in asset_targets:
+                asset_info = asset_target.get(asset_name, None)
+                if asset_info:
+                    return asset_info
+    
+    def get_asset_origin_maya_info_table_data(self, asset_sels: List[str] = []) -> Optional[Dict[str, Any]]:
+        """Get original Maya asset info for table display.
+
+        Args:
+            asset_sels (List[str], optional): Selected asset [type, name]. Defaults to [].
+
+        Returns:
+            Optional[Dict[str, Any]]: Maya asset info dictionary or None.
+        """
+        seqshot_sels = self.get_seqshot_selection(last_one=True)
+        if all([seqshot_sels, asset_sels]):
+            seq = seqshot_sels[0]
+            shot = seqshot_sels[1]
+            asset_type = asset_sels[0]
+            asset_name = asset_sels[1]
+            asset_origin_maya_info = self.get_asset_origin_maya_info(asset_type=asset_type, asset_name=asset_name)
+            if asset_origin_maya_info: 
+                return asset_origin_maya_info
+            
+    def get_render_data(self) -> Dict[str, Any]:
+        """Collect render-related data from UI fields.
+
+        Returns:
+            Dict[str, Any]: Render configuration data.
+        """
+        render_data = {
+            'user':TTSet.uis.user.text(),
+            'dept':TTSet.uis.dept.text(),
+            'cmt':TTSet.uis.cmt.text(),
+            'priority':TTSet.uis.priority.text(),
+            'after':TTSet.uis.after.dateTime().toString("MM dd hh:mm"),
+            'service_key':TTSet.uis.service_key.currentText(),
+        }
+        return render_data       
+
+                    
+class TTSet(TTGet):
+    """Turn Track setter with UI.
+
+    Notes:
+        All of modules in this class have no returns, cause this class is the setter.
+
+    Base Classes:
+        TTGet: TurnTable's getter class.
+
+    Attributes:
+        uis (TurnTrackUIs): Created UI's dict.
+        tmp_path_seqs_dir (str): Temporary variable with current path to open.
+        rclick_acts (RClickActs): Class to implement right click actions.
+    """
+
+    uis = None
+    tmp_path_seqs_dir = ''
+    
+    def __init__(self):
+        super().__init__()
+        TTSet.uis = TurnTrackUIs()
+        self.rclick_acts = None
+    
+    @property
+    def get_rclick_act(self) -> RClickActs:
+        """Get right-click actions, create if not exists.
+
+        Returns:
+            RClickActs: Right-click action manager.
+        """
+        if not self.rclick_acts:
+            from lib.ui import RClickActs
+            self.rclick_acts = RClickActs(p4=self.get_p4)
+        return self.rclick_acts
+            
+    def set_table_asset_maya(self, asset_sels: List[str] = []):
+        """Populate Maya asset info table.
+
+        Args:
+            asset_sels (List[str], optional): Selected asset [type, name]. Defaults to [].
+        """
+        asset_origin_maya_info = self.get_asset_origin_maya_info_table_data(asset_sels=asset_sels)
+        header_v = list(asset_origin_maya_info.keys())
+        header_h = ['[ Maya File Info ] '+asset_sels[1]]
+        table = self.ui.table.set_table_data(table=TTSet.uis.table_asset_maya, header_h=header_h, header_v=header_v, data=[list(asset_origin_maya_info.values())], enable=True)
+        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+
+    def set_table_asset_info(self, asset_sels: List[str] = []):
+        """Populate USD asset info table.
+
+        Args:
+            asset_sels (List[str], optional): Selected asset [type, name]. Defaults to [].
+        """
+        asset_info = self.get_asset_info_table_data(asset_sels=asset_sels)
+        header_v = list(asset_info.keys())
+        header_h = ['[ Usd File Info ] '+asset_sels[1]]
+        
+        table = self.ui.table.set_table_data(table=TTSet.uis.table_asset_info, header_h=header_h, header_v=header_v, data=[list(asset_info.values())], enable=True, col_sel=False)
+        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+
+    def set_btn_usd2json(self, q_widget: Optional[Any] = None):
+        """Export USD assets to JSON files.
+
+        Args:
+            q_widget (Optional[Any], optional): Parent widget for directory selection. Defaults to None.
+        """
+        seqshot_sels = self.get_seqshot_selection()
+        if seqshot_sels:
+            seqshot_sel_txt = self.shot_lib.get_seqshots_as_txt(seqshots=seqshot_sels)
+            msg = Message(title='Usd->Json', txt=f'Do you really want to save assets of these?\n\n[{seqshot_sel_txt}]', no_option=1)
+            if msg.answer:   
+                path_dir = self.ui.get_directory_sel(q_widget=q_widget)
+                if path_dir:
+                    for seq, shots in seqshot_sels.items():
+                        for shot in shots:        
+                            assets = self.get_asset_data_usd_and_flow(seq=seq, shot=shot)
+                            jsonName = f'{seq}_{shot}_usd_assets.json'
+                            pathJson = os.path.join(path_dir, jsonName)
+                            Core.set_json(content=assets, path=pathJson)
+                    msg = Message(title='Usd->Json', txt='Assets in usd data has been saved.')
+        else:
+            msg = Message(title='Failed : Usd->Json', txt='You need to select shots at least one.')
+            
+    def set_btn_usd2flow(self):
+        """Upload USD assets to Flow.
+        """
+        if self.flow_shots.sg:
+            seqshot_sels = self.get_seqshot_selection()
+            if seqshot_sels:
+                seqshot_sel_txt = self.shot_lib.get_seqshots_as_txt(seqshots=seqshot_sels)
+                msg = Message(title='Usd->Flow', txt=f'Do you really want to upload assets of these?\n\n[{seqshot_sel_txt}]', no_option=1)
+                if msg.answer:        
+                    if msg.answer:     
+                        for seq, shots in seqshot_sels.items():
+                            for shot in shots:        
+                                asset_data = self.usd_assets.get_assets_from_usds(seq=seq, shot=shot)   
+                                asset_names = [asset.get('origin_name') for asset in asset_data]
+                                if self.flow_shots.sg:
+                                    flowAsset_data = self.get_flow_assets.get_asset_data_by_asset_names(asset_names=asset_names)
+                                    self.flow_shots.set_update_new_assets_on_flow(seq=seq, shot=shot, flowAsset_data=flowAsset_data)
+            else:
+                msg = Message(title='Failed : Usd->Flow', txt='You need to select shots at least one.')
+        else:
+            msg = Message(title='Failed : Usd->Flow', txt='You need to check your flow connection.')
+
+    def set_chk_expand_usd(self):
+        """Expand or collapse all USD assets tree based on checkbox.
+        """
+        if TTSet.uis.chk_expand_usd.isChecked():
+            TTSet.uis.tree_assets_usd.expandAll()
+        else:
+            TTSet.uis.tree_assets_usd.collapseAll()
+
+    def set_chk_show_usd(self, seqshot_sels: List[str] = []):
+        """Show USD assets in tree based on selection.
+
+        Args:
+            seqshot_sels (List[str], optional): Sequence and shot selection. Defaults to [].
+        """
+        if TTSet.uis.chk_show_usd.isChecked():
+            if not seqshot_sels:
+                seqshot_sels = self.get_seqshot_selection(last_one=True)
+                
+            if seqshot_sels:
+                if all(seqshot_sels):
+                    assets = self.usd_assets.get_assets_from_usds(seq=seqshot_sels[0], shot=seqshot_sels[1])   
+                    asset_names = [x['origin_name'] for x in assets]  
+                    if self.get_flow_assets.sg:
+                        asset_type_names = self.get_flow_assets.get_asset_type_names_from_flow(asset_names=asset_names, names_by_types=True)
+                    else:
+                        asset_type_names = self.usd_assets.get_asset_type_names(asset_names=tuple(asset_names), names_by_types=True)
+                    self.ui.tree.set_tree_data(tree=TTSet.uis.tree_assets_usd, data=asset_type_names, expand_all=TTSet.uis.chk_expand_usd.isChecked(), color_or_not=1)
+                    TTSet.uis.chk_expand_usd.setEnabled(True)
+                    TTSet.uis.tree_assets_usd.setEnabled(True)
+                    asset_sels = self.get_asset_sels()
+                    self.set_seq_viewer(asset_sels=asset_sels)
+                else:
+                    self.set_block_asset_sections()
+            else:
+                self.set_block_asset_sections()
+        else:
+            self.set_block_asset_sections()
+    
+    def set_block_asset_sections(self):
+        """Disable or clear all asset-related UI sections.
+        """
+        TTSet.uis.chk_expand_usd.setEnabled(False)
+        TTSet.uis.tree_assets_usd.clear()
+        TTSet.uis.tree_assets_usd.setEnabled(False)
+        viewer = TTSet.uis.viewer_img
+        slider = TTSet.uis.viewer_slider
+        self.ui.img_viewer.set_clean_seq_viewer(viewer=viewer, slider=slider)
+
+    def set_changed_asset_sels(self):
+        """Handle changes in asset selection.
+        """
+        asset_sels = self.get_asset_sels()
+        if asset_sels:
+            TTSet.uis.chk_show_table.setEnabled(True)
+            self.set_chk_show_table(asset_sels=asset_sels)
+            self.set_seq_viewer(asset_sels=asset_sels)
+
+        else:
+            self.set_table_asset_info_clear()
+            self.set_table_asset_maya_clear()
+            TTSet.uis.table_asset_maya.setEnabled(False)
+            TTSet.uis.table_asset_info.setEnabled(False)
+            TTSet.uis.chk_show_table.setEnabled(False)
+
+    def set_chk_show_table(self, asset_sels: List[str] = []):
+        """Show or hide asset info tables.
+
+        Args:
+            asset_sels (List[str], optional): Selected asset [type, name]. Defaults to [].
+        """
+        self.set_table_asset_info_clear()
+        self.set_table_asset_maya_clear()
+        if TTSet.uis.chk_show_table.isChecked():
+            if not asset_sels:
+                asset_sels = self.get_asset_sels()
+
+            TTSet.uis.table_asset_info.setEnabled(True)
+            TTSet.uis.table_asset_maya.setEnabled(True)
+            self.set_table_asset_info(asset_sels=asset_sels)    
+            self.set_table_asset_maya(asset_sels=asset_sels)    
+            asset_sels = self.get_asset_sels()
+            self.set_seq_viewer(asset_sels=asset_sels)
+        else:
+            TTSet.uis.table_asset_info.setEnabled(False)
+            TTSet.uis.table_asset_maya.setEnabled(False)
+            viewer = TTSet.uis.viewer_img
+            slider = TTSet.uis.viewer_slider
+            self.ui.img_viewer.set_clean_seq_viewer(viewer=viewer, slider=slider)
+
+        if TTSet.uis.table_asset_maya.item(0,0):
+            TTSet.uis.btn_turntable.setEnabled(True)
+        else:
+            TTSet.uis.btn_turntable.setEnabled(False)
+
+    def set_table_asset_maya_clear(self):
+        """Clear Maya asset info table and viewer.
+        """
+        TTSet.uis.table_asset_maya.clear()
+        TTSet.uis.table_asset_maya.setRowCount(0)
+        TTSet.uis.table_asset_maya.setColumnCount(0)
+        viewer = TTSet.uis.viewer_img
+        slider = TTSet.uis.viewer_slider
+        self.ui.img_viewer.set_clean_seq_viewer(viewer=viewer, slider=slider)
+
+    def set_table_asset_info_clear(self):
+        """Clear USD asset info table.
+        """
+        TTSet.uis.table_asset_info.clear()
+        TTSet.uis.table_asset_info.setRowCount(0)
+        TTSet.uis.table_asset_info.setColumnCount(0)
+
+    def set_btn_flow_browser_shot(self):
+        """Open Flow page for selected shot.
+        """
+        if self.flow_shots.sg:
+            seqshot_sels = self.get_seqshot_selection(last_one=True)
+            if seqshot_sels:
+                page_link = self.flow_shots.get_seqshot_page_link(seq=seqshot_sels[0], shot=seqshot_sels[1])
+                if page_link:
+                    Core.get_open(target=page_link) 
+            else:
+                msg = Message(title='Failed : Open Flow Shot Browser', txt='You need to select shots at least one.')
+        else:
+            msg = Message(title='Failed : Open Flow Shot Browser', txt='You need to check your flow connection.')
+      
+    def set_btn_flow_browser_asset(self):
+        """Open Flow page for selected asset.
+        """
+        if self.get_flow_assets.sg:
+            asset_sels = self.get_asset_sels()
+            if asset_sels:
+                page_link = self.get_flow_assets.get_asset_page_link(shot=asset_sels[1])
+                if page_link:
+                    Core.get_open(target=page_link) 
+            else:
+                msg = Message(title='Failed : Open Flow Asset Browser', txt='You need to select assets at least one.')
+        else:
+            msg = Message(title='Failed : Open Flow Asset Browser', txt='You need to check your flow connection.')
+            
+    def set_changed_seqshot_sels(self):
+        """Handle changes in sequence/shot selection.
+        """
+        seqshot_sels = self.get_seqshot_selection(last_one=True)
+        if seqshot_sels:
+            if all(seqshot_sels):
+                self.set_all_usd_uis(enable=True)      
+                self.set_chk_show_usd(seqshot_sels=seqshot_sels)
+            else:
+                self.set_all_usd_uis(enable=False)
+        else:
+            self.set_all_usd_uis(enable=False)
+            
+    def set_all_usd_uis(self, enable=False):
+        """Enable or disable all USD UI elements.
+
+        Args:
+            enable (bool, optional): Enable state. Defaults to False.
+        """
+        TTSet.uis.chk_show_usd.setEnabled(enable)
+        TTSet.uis.chk_expand_usd.setEnabled(enable)
+        TTSet.uis.btn_open_flow_shot.setEnabled(enable)
+        TTSet.uis.btn_usd2json.setEnabled(enable)
+        TTSet.uis.btn_usd2flow.setEnabled(enable)
+        TTSet.uis.btn_open_flow_asset.setEnabled(enable)
+        TTSet.uis.tree_assets_usd.setEnabled(enable)
+        if not enable:
+            TTSet.uis.tree_assets_usd.clear()
+
+    def set_context_menu_info(self, position: QPoint):
+        """Set context menu for USD asset info table.
+
+        Args:
+            position (QPoint): Position of right-click.
+        """
+        table = TTSet.uis.table_asset_info
+        index = table.indexAt(position)
+        row = index.row()
+        if row < 0:
+            return
+
+        v_header_item = table.verticalHeaderItem(row)
+        label_item = table.item(row, 0)
+        if all([v_header_item, label_item]):        
+            header = v_header_item.text()
+            # label = label_item.text()
+
+            seqshot_sels = self.get_seqshot_selection(last_one=True)
+            asset_sels = self.get_asset_sels()
+            seq = seqshot_sels[0]
+            shot = seqshot_sels[1]
+            asset_type = asset_sels[0]
+            asset_name = asset_sels[1]
+            prefix = header.split('_')[0]
+            suffix = header.split('_')[1]
+            path = ''
+            if prefix in ['model','post']:
+                path = os.path.join(os.getenv('base_model'), seq, shot, asset_name)
+                if suffix in ['current', 'process']:
+                    target = 'current'
+                else:
+                    target = self.usd_assets.get_max_version(path_dir=path)                    
+                path = os.path.join(path, target, asset_name+'.usd')
+            elif prefix == 'asset':
+                path = os.path.join(os.getenv('base_asset'), asset_type, asset_name, suffix, asset_name+'.usd')
+            
+            if path:
+                menu = QMenu()
+                actOpenEx = self.get_rclick_act.get_act_open_explorer(path=path)
+                actCopyPath = self.get_rclick_act.get_act_copy_path(path=path)
+                menu.addAction(actOpenEx)
+                menu.addAction(actCopyPath)
+                menu.exec_(table.viewport().mapToGlobal(position))
+                
+    def set_context_menu_maya(self, position: QPoint):
+        """Set context menu for Maya asset info table.
+
+        Args:
+            position (QPoint): Position of right-click.
+        """
+        table = TTSet.uis.table_asset_maya
+        item = table.item(0,0)
+        
+        if item:
+            path = os.path.join(os.getenv('base_asset_origin'), item.text())
+            menu = QMenu()
+            acts = self.get_rclick_act.get_all_acts(path=path)
+            for act in acts:
+                menu.addAction(act)
+            menu.exec_(table.viewport().mapToGlobal(position))
+                
+    def set_turntable_render(self):
+        """Trigger turntable render for selected Maya asset.
+        """
+        table = TTSet.uis.table_asset_maya
+        item = table.item(0,0)
+        
+        if item:
+            render_data = self.get_render_data()
+            path_tail = item.text()
+            path_tail_split = path_tail.split('/')
+            render_data['tt_type'] = path_tail_split[0]
+            render_data['tt_name'] = path_tail_split[1]
+            render_data['tt_ver'] = path_tail_split[2]
+            render_data['start_frame'] = '1'
+            render_data['end_frame'] = '100'
+            target_maya = os.path.join(os.getenv('base_asset_origin'), path_tail)        
+            if os.path.exists(target_maya):
+                render_data['tt_exe'] = os.getenv('base_bin')+'/maya/turntable.py'
+                render_data['tt_target_maya'] = target_maya
+                turntable = TurntableRender()
+                turntable.set_render(render_data=render_data)                
+        
+    def set_seq_viewer(self, asset_sels: List[str] = []):
+        """Set image sequence viewer for selected asset.
+
+        Args:
+            asset_sels (List[str], optional): Selected asset [type, name]. Defaults to [].
+        """
+        TTSet.tmp_path_seqs_dir = ''
+        if asset_sels:
+            asset_type = asset_sels[0]
+            asset_name = asset_sels[1]
+            table = TTSet.uis.table_asset_maya
+            if table:
+                if table.item(0,0):
+                    ver = table.item(0,0).text().split('_')[-1].split('.')[0]
+                    path_dir = os.path.join(os.getenv('base_render_asset'), 'turntable', asset_type, asset_name, ver)
+                    viewer = TTSet.uis.viewer_img
+                    slider = TTSet.uis.viewer_slider
+                    if os.path.exists(path_dir):
+                        TTSet.tmp_path_seqs_dir = path_dir
+                        self.ui.img_viewer.set_clean_seq_viewer(viewer=viewer, slider=slider)
+                        TTSet.uis.viewer_slider = self.ui.img_viewer.set_img_seq_viewer(viewer=viewer, slider=slider, path_dir=path_dir)
+                    else:
+                        self.ui.img_viewer.set_clean_seq_viewer(viewer=viewer, slider=slider)
+    
+        if TTSet.tmp_path_seqs_dir:
+            TTSet.uis.btn_rendered_dir.setEnabled(True)
+            TTSet.uis.btn_play_rv.setEnabled(True)
+        else:
+            TTSet.uis.btn_rendered_dir.setEnabled(False)
+            TTSet.uis.btn_play_rv.setEnabled(False)
+
+
+class TurnTrackUIs:
+    """TurnTrack's Ui items dynamic dictionary.
+    
+    Attributes:
+        _data (dict): Get and set ui items. Default is {}.
+    """
+    
+    def __init__(self):
+        self._data = {}
+        
+    def __getattr__(self, name: str) -> Any:
+        """Dynamic getter for UI elements.
+
+        Args:
+            name (str): Attribute name.
+
+        Returns:
+            Any: Stored UI element.
+        """
+        if name in self._data:
+            return self._data[name]
+        raise AttributeError(f'TurnTrackUIs has no attribute "{name}"')
+    
+    def __setattr__(self, name: str, value: Any):
+        """Dynamic setter for UI elements.
+
+        Args:
+            name (str): Attribute name.
+            value (Any): Value to store.
+        """
+        if name == '_data':
+            super().__setattr__(name, value)
+        else:
+            self._data[name] = value
+
+
+class TurnTrackUI(QWidget):
+    """Create TurnTrack's main window and link the features in it.
+
+    Notes:
+        Both UiVbox, UiHbox are classes which set up the layout including ui items. 
+        All of modules in this class have no returns, cause this class is the setter.
+
+    Base Classes:
+        QWidget: Create a main window.
+
+    Attributes:
+        title (str, optional): Window title. Defaults to 'NO TITLE'.
+        widthW (int, optional): Window width. Defaults to 800.
+        heightW (int, optional): Window height. Defaults to 600.
+        
+        tt_set (TTSet): TurnTrack's setter class inherits TTGet(TurnTrack's getter class).        
+    """
+    
+    def __init__(self, title: str = 'NO TITLE', width: int = 800, height: int = 600):
+        super().__init__()
+        self.setWindowTitle(title)
+        self.widthW = width
+        self.heightW = height
+        self.resize(self.widthW , self.heightW)
+        self.tt_set = TTSet()
+        self.set_main_window()
+
+    def set_main_window(self):
+        """Setup the main window.
+        """
+        main = UiHbox()
+        self.set_tree_shots(parent=main)
+        
+        v = UiVbox(parent=main)
+        
+        h = UiHbox(parent=v)
+        self.set_tree_assets_usd(parent=h)
+        self.set_table_asset_info_usd(parent=h)
+        
+        h = UiHbox(parent=v)
+        self.set_table_asset_info_origin(parent=h)
+        self.set_turntable_viewer(parent=h)
+        
+        self.setLayout(main)
+        self.set_ui_size()
+        self.set_ui_features()
+
+    def set_tree_shots(self, parent: Optional[Any] = ''):
+        """Setup shot tree widget.
+
+        Args:
+            parent (Optional[Any], optional): Parent layout/widget. Defaults to ''.
+        """
+        v = UiVbox(parent=parent)
+        self.tt_set.uis.tree_shots = v.get_v_tree(data=self.tt_set.seqshots)
+        self.tt_set.uis.btn_open_flow_shot = v.get_v_button(label='flow shot', enable=False)
+    
+    def set_tree_assets_usd(self, parent: Optional[Any] = ''):
+        """Setup USD asset tree widget.
+
+        Args:
+            parent (Optional[Any], optional): Parent layout/widget. Defaults to ''.
+        """
+        v = UiVbox(parent=parent)
+        h = UiHbox(parent=v)
+        self.tt_set.uis.chk_show_usd = h.get_h_chkbox(label='show', default=0, enable=False)
+        self.tt_set.uis.chk_expand_usd = h.get_h_chkbox(label='expand', default=1, enable=False)
+        self.tt_set.uis.tree_assets_usd = v.get_v_tree(enable=False, multi=False)
+        h = UiHbox(parent=v)
+        self.tt_set.uis.btn_usd2json = h.get_h_button(label='usd->json', enable=False)
+        self.tt_set.uis.btn_usd2flow = h.get_h_button(label='usd->flow', enable=False)
+        self.tt_set.uis.btn_open_flow_asset = h.get_h_button(label='flow asset', enable=False)
+    
+    def set_table_asset_info_usd(self, parent: Optional[Any] = ''):
+        """Setup USD asset info table widget.
+
+        Args:
+            parent (Optional[Any], optional): Parent layout/widget. Defaults to ''.
+        """
+        v = UiVbox(parent=parent)
+        self.tt_set.uis.chk_show_table = v.get_v_chkbox(label='show asset info', default=0, enable=False)
+        h = UiHbox(parent=v)
+        self.tt_set.uis.table_asset_info = h.get_h_table(enable=False)
+        
+    def set_table_asset_info_origin(self, parent: Optional[Any] = ''):
+        """Setup Maya asset info table widget.
+
+        Args:
+            parent (Optional[Any], optional): Parent layout/widget. Defaults to ''.
+        """
+        v = UiVbox(parent=parent)
+        self.tt_set.uis.table_asset_maya = v.get_v_table(enable=False)    
+        
+        h = UiHbox(parent=v)
+        self.tt_set.uis.user = h.get_v_field(label='user : ', default=os.getenv('user',''), enable=False)
+        self.tt_set.uis.dept = h.get_v_field(label='dept : ', default=os.getenv('dept',''), enable=False)
+        
+        h = UiHbox(parent=v)
+        self.tt_set.uis.after = h.get_h_date(label='after : ')
+        
+        h = UiHbox(parent=v)
+        self.tt_set.uis.cmt = h.get_v_field(label='comment : ', default='turntable test')
+
+        h = UiHbox(parent=v)
+        
+        v1 = UiVbox(parent=h) 
+        h1 = UiHbox(parent=v1)
+        self.tt_set.uis.priority = h1.get_v_field(label='priority : ', default='100', limit_exp=r'\d{3}')
+        h2 = UiHbox(parent=v1)
+        self.tt_set.uis.service_key = h2.get_h_combobox(label='service : ', default=['RENDER'])
+        self.tt_set.uis.service_key.setCurrentText('RENDER')
+        
+        v2 = UiVbox(parent=h) 
+        self.tt_set.uis.btn_turntable = v2.get_v_button(label='Turntable\nRender', enable=False)
+        
+    def set_turntable_viewer(self, parent: Optional[Any] = ''):
+        """Setup turntable image sequence viewer.
+
+        Args:
+            parent (Optional[Any], optional): Parent layout/widget. Defaults to ''.
+        """    
+        v = UiVbox(parent=parent)
+        self.tt_set.uis.viewer_img, self.tt_set.uis.viewer_slider = v.get_v_img_viewer(q_widget=self, size=(self.widthW/3*2, self.heightW/2))
+
+        h = UiHbox(parent=v)
+        self.tt_set.uis.btn_tractor = h.get_h_button(label='Tractor', enable=True)
+        self.tt_set.uis.btn_rendered_dir = h.get_h_button(label='Rendered\nDirectory', enable=True)
+        self.tt_set.uis.btn_play_rv = h.get_h_button(label='Play RV', enable=False)
+        
+    def set_ui_size(self):
+        """Set fixed sizes and minimum sizes for UI elements.
+        """
+        per_width = int(self.widthW/6)
+        per_width_half = int(per_width/2)
+        per_width_div_3 = int(per_width/3)
+        
+        self.tt_set.uis.tree_shots.setFixedWidth(per_width)
+        self.tt_set.uis.btn_open_flow_shot.setFixedWidth(per_width)
+        self.tt_set.uis.btn_open_flow_shot.setFixedHeight(30)
+        self.tt_set.uis.tree_assets_usd.setFixedWidth(per_width*2)
+        self.tt_set.uis.btn_usd2json.setMinimumWidth(per_width_half)
+        self.tt_set.uis.btn_open_flow_asset.setMinimumWidth(per_width_half)
+        self.tt_set.uis.btn_usd2flow.setMinimumWidth(per_width_half)        
+        self.tt_set.uis.btn_usd2json.setFixedHeight(30)
+        self.tt_set.uis.btn_open_flow_asset.setFixedHeight(30)
+        self.tt_set.uis.btn_usd2flow.setFixedHeight(30)
+        self.tt_set.uis.table_asset_info.setMinimumWidth(per_width)
+        self.tt_set.uis.table_asset_info.setMinimumHeight(per_width_div_3)
+        self.tt_set.uis.table_asset_maya.setMinimumWidth(per_width*3)
+        self.tt_set.uis.table_asset_maya.setMinimumHeight(per_width_div_3)
+        self.tt_set.uis.btn_tractor.setFixedHeight(40)
+        self.tt_set.uis.btn_turntable.setFixedHeight(60)
+        self.tt_set.uis.btn_rendered_dir.setFixedHeight(40)
+        self.tt_set.uis.btn_play_rv.setFixedHeight(40)
+
+    def set_ui_features(self):
+        """Connect UI signals to TTSet functions.
+        """
+        self.tt_set.uis.tree_shots.itemSelectionChanged.connect(lambda *args: self.tt_set.set_changed_seqshot_sels())
+        self.tt_set.uis.btn_usd2json.clicked.connect(lambda *args: self.tt_set.set_btn_usd2json(q_widget=self))
+        self.tt_set.uis.btn_usd2flow.clicked.connect(lambda *args: self.tt_set.set_btn_usd2flow())
+        self.tt_set.uis.chk_show_usd.stateChanged.connect(lambda *args: self.tt_set.set_chk_show_usd())
+        self.tt_set.uis.chk_expand_usd.stateChanged.connect(lambda *args: self.tt_set.set_chk_expand_usd())
+        self.tt_set.uis.btn_open_flow_shot.clicked.connect(lambda *args: self.tt_set.set_btn_flow_browser_shot())
+        self.tt_set.uis.btn_open_flow_asset.clicked.connect(lambda *args: self.tt_set.set_btn_flow_browser_asset())
+        self.tt_set.uis.tree_assets_usd.itemSelectionChanged.connect(lambda *args: self.tt_set.set_changed_asset_sels())
+        self.tt_set.uis.chk_show_table.stateChanged.connect(lambda *args: self.tt_set.set_chk_show_table())
+        self.tt_set.uis.table_asset_maya.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.tt_set.uis.table_asset_maya.customContextMenuRequested.connect(self.tt_set.set_context_menu_maya)
+        self.tt_set.uis.table_asset_maya.cellClicked.connect(lambda *args: self.tt_set.uis.table_asset_maya.selectAll())
+        self.tt_set.uis.table_asset_info.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.tt_set.uis.table_asset_info.customContextMenuRequested.connect(self.tt_set.set_context_menu_info)
+        self.tt_set.uis.btn_tractor.clicked.connect(lambda *args: Core.get_open(target=f'http://{os.getenv("TRACTOR_ENGINE","")}/tv/'))
+        self.tt_set.uis.btn_turntable.clicked.connect(lambda *args: self.tt_set.set_turntable_render())
+        self.tt_set.uis.btn_rendered_dir.clicked.connect(lambda *args: Core.get_open(target=TTSet.tmp_path_seqs_dir))
+        self.tt_set.uis.btn_play_rv.clicked.connect(lambda *args: Core.get_open(target='rv ' + TTSet.tmp_path_seqs_dir))
+
+
+if __name__ == '__main__':
+    LOG.info('start [ Turn Track ]')
+    app = QApplication(sys.argv)
+    font = QFont("Consolas", 10)
+    app.setFont(font)    
+    window = TurnTrackUI(title='Turn Track')
+    window.show()
+    sys.exit(app.exec_())

@@ -1,0 +1,7 @@
+#usda 1.0
+(
+    defaultPrim = "girl"
+    customLayerData = {
+        string asset_origin = "char/girl/v003/girl_v002.mb"
+    }
+)

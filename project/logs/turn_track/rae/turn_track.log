@@ -1,0 +1,14 @@
+[2025-08-21 12:40:17][9952][rae][/home/user_rae/Documents/project/public/bin/turn_track][INFO][<module>][865] start [ Turn Track ]
+[2025-08-21 12:40:24][9952][rae][/home/user_rae/Documents/project/public/lib/shot.py][WARNING][__init__][33] failed flow connect
+[2025-08-21 12:40:27][9952][rae][/home/user_rae/Documents/project/public/lib/asset.py][INFO][get_assets_from_usds][305] Get Assets from USD : /home/user_rae/Documents/project/public/data/shot/s0010/0010/shot.usd
+[2025-08-21 12:40:27][9952][rae][/home/user_rae/Documents/project/public/lib/asset.py][INFO][get_dependencies][244] path_usd : /home/user_rae/Documents/project/public/data/shot/s0010/0010/shot.usd
+[2025-08-21 12:40:33][9952][rae][/home/user_rae/Documents/project/public/lib/asset.py][WARNING][__init__][33] failed flow connect
+[2025-08-21 12:40:35][9952][rae][/home/user_rae/Documents/project/public/lib/asset.py][INFO][get_assets_from_usds][305] Get Assets from USD : /home/user_rae/Documents/project/public/data/shot/s0010/0010/shot.usd
+[2025-08-21 12:40:35][9952][rae][/home/user_rae/Documents/project/public/lib/asset.py][INFO][get_dependencies][244] path_usd : /home/user_rae/Documents/project/public/data/shot/s0010/0010/shot.usd
+[2025-08-21 12:40:35][9952][rae][/home/user_rae/Documents/project/public/lib/perforce.py][INFO][__init__][407] perforce connected
+[2025-08-21 12:40:35][9952][rae][/home/user_rae/Documents/project/public/lib/perforce.py][WARNING][get_filelogs][265] [Error]: "Path '/home/user_rae/Documents/project/public/data/asset_origin/char/boy/v002/boy_v002.mb' is not under client's root '{$base_home}'."
+[2025-08-21 12:40:35][9952][rae][/home/user_rae/Documents/project/public/lib/perforce.py][WARNING][get_filelogs][265] [Error]: "Path '/home/user_rae/Documents/project/public/data/asset_origin/char/boy/v002/boy_v002.mb' is not under client's root '{$base_home}'."
+[2025-08-21 12:40:35][9952][rae][/home/user_rae/Documents/project/public/lib/perforce.py][WARNING][get_revs][344] [Warning]: '//depot/data/asset_origin/char/boy/v002/boy_v002.mb - no such file(s).'
+[2025-08-21 12:40:39][9952][rae][/home/user_rae/Documents/project/public/lib/core.py][INFO][set_file][85] save : /home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_12_40_39.sh
+[2025-08-21 12:40:39][9952][rae][/home/user_rae/Documents/project/public/lib/core.py][INFO][set_file][85] save : /home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_12_40_39.alf
+[2025-08-21 12:40:39][9952][rae][/home/user_rae/Documents/project/public/lib/render/render_core.py][INFO][set_exe][143] /opt/pixar/Tractor-2.3/bin/tractor-tractor_spool --alfescape --user=rae /home/user_rae/Documents/project/public/render/asset/logs/char_boy_v002_td_rae_2025_08_21_12_40_39.alf[2025-08-27 16:53:32][26408][rae][/home/user_rae/Documents/project/public/bin/turn_track][INFO][<module>][879] start [ Turn Track ]

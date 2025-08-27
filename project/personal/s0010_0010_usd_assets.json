@@ -1,0 +1,33 @@
+{
+    "char": [
+        {
+            "boy": {
+                "model_current": "v002",
+                "model_max": "v002",
+                "asset_stable": "v002",
+                "asset_latest": "v002",
+                "post_process": "blendShape"
+            }
+        },
+        {
+            "girl": {
+                "model_current": "v001",
+                "model_max": "v002",
+                "asset_stable": "v003",
+                "asset_latest": "v003",
+                "post_process": "subdiv"
+            }
+        }
+    ],
+    "prop": [
+        {
+            "bike": {
+                "model_current": "v002",
+                "model_max": "v003",
+                "asset_stable": "v002",
+                "asset_latest": "v002",
+                "post_process": "blendShape"
+            }
+        }
+    ]
+}
