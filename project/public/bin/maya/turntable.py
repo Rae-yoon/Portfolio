@@ -88,7 +88,7 @@ class Turntable:
         cmds.setAttr(self.asset_grp + '.scaleY', scale_y * scale_ratio)
         cmds.setAttr(self.asset_grp + '.scaleZ', scale_z * scale_ratio)
 
-    def setCam(self) -> None:
+    def set_cam(self) -> None:
         """Create and configure the camera for the turntable.
         """
         self.cam, cam_shape = cmds.camera(name=self.cam)
@@ -206,7 +206,7 @@ export tt_cam={self.cam}
         """
         self.get_open_import()        
         cmds.playbackOptions(e=1, min=START_FRAME, max=END_FRAME)
-        self.setCam()
+        self.set_cam()
         self.set_obj_scale()
         self.set_rotate()
         self.set_render_settings()
