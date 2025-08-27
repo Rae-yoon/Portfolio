@@ -4,6 +4,7 @@ This repository showcases a collection of **pipeline tools**
 developed for animation and VFX production envrionments.
 All tools and modules were designed for real production use.
 
+- All credentials and values are dummy placeholders for demo purpose.
 ---
 
 ## Main tool
