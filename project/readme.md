@@ -57,6 +57,7 @@ All tools and modules were designed for real production use.
 
 
 ## Project Structure
+```text
 /project
 ├── config
 │   ├── public.sh        # Public environment
@@ -154,7 +155,7 @@ All tools and modules were designed for real production use.
 │       └── shot         # Shot renders
 │           └── logs     # Shot render logs
 └── readme.md
-
+```
 
 ## Environment Setup
 
