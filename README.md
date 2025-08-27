@@ -7,7 +7,7 @@ All tools and modules were designed for real production use.
 ---
 
 ## Main tool
-- ** turn_track
+- ** turn_track**
     - Developed Turn Track, a studio render tool that automates turntable workflows through Tractor integration, USD/Flow(ShotGrid) sync, and modular UI design. 
 
 ## Key Features
