@@ -167,8 +167,10 @@ export base_home=$base_root/home/$user # do not modify this line
 ``` 
 
 ### 2) Run the environment files.
+
 ```bash
 export project='fill this with your root path'
+# in public.sh : export base_root="{$project}/project"
 cd $project
 source ./config/public.sh && source ./personal/.personal.sh     
 ```
