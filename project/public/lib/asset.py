@@ -42,7 +42,7 @@ class FlowAssets:
                 configEnv = os.path.join(os.environ['base_config'], '.flow.env')
                 load_dotenv(configEnv)
                 self.base_filter = ['project','is',{'type':'Project', 'id': os.getenv('PRJ_ID')}]
-                self.sg = Shotgun(os.getenv('flow_url'), script_name=os.getenv('ASSET_ID'), api_key=os.getenv('ASSET_PW'))
+                self.sg = Shotgun(os.getenv('FLOW_URL'), script_name=os.getenv('ASSET_ID'), api_key=os.getenv('ASSET_PW'))
             except:
                 self.sg = None
                 self.log.warning('failed flow connect')
