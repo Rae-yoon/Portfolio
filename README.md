@@ -171,7 +171,7 @@ export dept='user_department'
 export base_home=$base_root/home/$user # do not modify this line
 ``` 
 
-### 2) Specify the appropriate paths for the environment from the commented-out P4PORT to the commented-out TRACTOR_ENGINE, and then uncomment them.
+### 2) Open ./config/public.sh, specify the appropriate paths for the environment from the commented-out P4PORT to the commented-out TRACTOR_ENGINE, and then uncomment them.
 ```bash
 # export P4PORT="192.000.00.000:1666"
 export flow_url="https://shotgrid.~.com"
