@@ -200,7 +200,7 @@ SHOT_PW=password
 
 ```bash
 export project='Replace with your root path'
-# in public.sh : export base_root="{$project}/project"
+# FYI : export base_root="{$project}/project" in public.sh
 cd $project
 source ./config/public.sh && source ./personal/.personal.sh     
 ```
