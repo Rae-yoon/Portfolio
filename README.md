@@ -162,7 +162,7 @@ All tools and modules were designed for real production use.
 └── readme.md
 ```
 
-## Environment Setup
+## Environment Setup (Linux)
 
 ### 1) Modify ./personal/.personal.sh file properly by your name and department.
 ```bash
@@ -171,7 +171,18 @@ export dept='user_department'
 export base_home=$base_root/home/$user # do not modify this line
 ``` 
 
-### 2) Run the environment files.
+### 2) Specify the appropriate paths for the environment from the commented-out P4PORT to the commented-out TRACTOR_ENGINE, and then uncomment them.
+```bash
+# export P4PORT="192.000.00.000:1666"
+export flow_url="https://shotgrid.~.com"
+export m24_py="/usr/autodesk/maya2024/bin/mayapy"
+export m24_render="/usr/autodesk/maya2024/bin/Render"
+export tractor_root="/opt/pixar/Tractor-2.3"
+export tractor_spool="/opt/pixar/Tractor-2.3/bin/tractor-tractor_spool"
+# export TRACTOR_ENGINE="192.000.000.000"
+```
+
+### 3) Run the environment files on your terminal.
 
 ```bash
 export project='Replace with your root path'
