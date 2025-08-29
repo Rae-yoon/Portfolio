@@ -182,6 +182,21 @@ export tractor_spool="/opt/pixar/Tractor-2.3/bin/tractor-tractor_spool"
 # export TRACTOR_ENGINE="192.000.000.000"
 ```
 
+### 2-1) Open ./config/.flow.env, specify the appropriate values for the environment.
+```bash
+#project
+FLOW_URL="https://shotgrid.~.com"
+PRJ_ID=123
+
+#assets
+ASSET_ID=assets
+ASSET_PW=password
+
+#shots
+SHOT_ID=shots
+SHOT_PW=password
+```
+
 ### 3) Run the environment files on your terminal.
 
 ```bash
