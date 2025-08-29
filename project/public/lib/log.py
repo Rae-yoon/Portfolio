@@ -138,7 +138,7 @@ class QLogger:
     fmt = "[%(asctime)s][%(process)d][%(user)s][%(pathname)s][%(levelname)s][%(funcName)s][%(lineno)d] %(message)s"
     datefmt = "%Y-%m-%d %H:%M:%S"
     when = "midnight"                  
-    dir_base = os.getenv("base_logs", "/home/user_rae/Documents/project/data/logs")   
+    dir_base = os.getenv("base_logs", os.path.join(os.getenv("project","/tmp"), "project", "logs"))   
     count_backup = 14                                 
     console_level = logging.INFO              
     file_level = logging.DEBUG           
