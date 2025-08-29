@@ -22,7 +22,6 @@ export base_shot="$base_data/shot"
 export exe_sh="/bin/bash"
 export exe_py="/usr/bin/python"
 # export P4PORT="192.000.00.000:1666"
-export flow_url="https://shotgrid.~.com"
 export m24_py="/usr/autodesk/maya2024/bin/mayapy"
 export m24_render="/usr/autodesk/maya2024/bin/Render"
 
