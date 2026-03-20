@@ -1,4 +1,4 @@
-# Animation / VFX Pipeline TD Portfolio
+# Pipeline / Tool Engineer (TD) Portfolio
 
 This repository showcases a collection of **pipeline tools** 
 developed for animation and VFX production environments.
