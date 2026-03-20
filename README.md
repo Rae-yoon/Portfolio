@@ -1,7 +1,7 @@
-# Animation / VFX Pipiline TD Portfolio
+# Animation / VFX Pipeline TD Portfolio
 
 This repository showcases a collection of **pipeline tools** 
-developed for animation and VFX production envrionments.
+developed for animation and VFX production environments.
 All tools and modules were designed for real production use.
 
 - All credentials and values are dummy placeholders for demo purpose.
